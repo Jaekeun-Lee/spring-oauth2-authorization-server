@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/oauth2")
@@ -23,10 +22,10 @@ public class OAuth2SecondAppController {
     private final Gson gson;
     private final RestTemplate restTemplate;
 
-    @GetMapping("/secondapp/callback")
+    @GetMapping(value = "/secondapp/callback") // 1. endpoint 주소 수정
     public OAuthToken callbackSocial(@RequestParam String code) {
 
-        String credentials = "secondapp:secondsecret";
+        String credentials = "secondapp:secondsecret"; // 2. credentials 정보 수정
         String encodedCredentials = new String(Base64.encodeBase64(credentials.getBytes()));
 
         HttpHeaders headers = new HttpHeaders();
@@ -35,24 +34,21 @@ public class OAuth2SecondAppController {
         headers.add("Authorization", "Basic " + encodedCredentials);
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-//        params.add("refresh_token", refreshToken);
-//        params.add("grant_type", "refresh_token");
         params.add("code", code);
         params.add("grant_type", "authorization_code");
-        params.add("redirect_uri", "http://localhost:8081/oauth2/secondapp/callback");
+        params.add("redirect_uri", "http://localhost:8081/oauth2/secondapp/callback"); // 3. redirect_uri 정보 수정
         HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
         ResponseEntity<String> response = restTemplate.postForEntity("http://localhost:8081/oauth/token", request, String.class);
-
         if (response.getStatusCode() == HttpStatus.OK) {
             return gson.fromJson(response.getBody(), OAuthToken.class);
         }
         return null;
     }
 
-    @GetMapping(value = "/secondapp/token/refresh")
+    @GetMapping(value = "/secondapp/token/refresh") // 4. endpoint 주소 수정
     public OAuthToken refreshToken(@RequestParam String refreshToken) {
 
-        String credentials = "secondapp:secondsecret";
+        String credentials = "secondapp:secondsecret"; // 5. credentials 정보 수정
         String encodedCredentials = new String(Base64.encodeBase64(credentials.getBytes()));
 
         HttpHeaders headers = new HttpHeaders();
